@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Lab Dashboard</title>
+    <meta http-equiv="refresh" content="5">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        h1, h2 {
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background: white;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #e9eef3;
+        }
+
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+
+        .checkedout {
+            color: red;
+            font-weight: bold;
+        }
+
+        .empty-note {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Lab Asset Tracking Dashboard</h1>
+
+    <div class="section">
+        <h2>Current Inventory</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset ID</th>
+                    <th>Asset Name</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Restricted</th>
+                    <th>Shelf Slot</th>
+                    <th>Current Holder</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in assets %}
+                <tr>
+                    <td>{{ asset["asset_id"] }}</td>
+                    <td>{{ asset["asset_name"] }}</td>
+                    <td>{{ asset["category"] }}</td>
+                    <td>
+                        {% if asset["available"] == 1 %}
+                            <span class="available">Available</span>
+                        {% else %}
+                            <span class="checkedout">Checked Out</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if asset["restricted"] == 1 %}Yes{% else %}No{% endif %}
+                    </td>
+                    <td>{{ asset["shelf_slot"] }}</td>
+                    <td>{{ asset["current_holder"] if asset["current_holder"] else "-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Recent Transactions</h2>
+        {% if transactions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Asset ID</th>
+                    <th>Action</th>
+                    <th>Result</th>
+                    <th>Reason</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td>{{ tx["transaction_id"] }}</td>
+                    <td>{{ tx["user_id"] }}</td>
+                    <td>{{ tx["asset_id"] if tx["asset_id"] else "-" }}</td>
+                    <td>{{ tx["action"] }}</td>
+                    <td>{{ tx["result"] }}</td>
+                    <td>{{ tx["reason"] }}</td>
+                    <td>{{ tx["timestamp"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-note">No transactions yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Recent Alerts</h2>
+        {% if alerts %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Asset ID</th>
+                    <th>Alert Type</th>
+                    <th>Message</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alert in alerts %}
+                <tr>
+                    <td>{{ alert["alert_id"] }}</td>
+                    <td>{{ alert["user_id"] if alert["user_id"] else "-" }}</td>
+                    <td>{{ alert["asset_id"] if alert["asset_id"] else "-" }}</td>
+                    <td>{{ alert["alert_type"] }}</td>
+                    <td>{{ alert["message"] }}</td>
+                    <td>{{ alert["timestamp"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-note">No alerts yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
