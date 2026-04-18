@@ -56,9 +56,9 @@ c.execute("INSERT OR REPLACE INTO users VALUES ('946175681221', 'Bob', 'TA', 3, 
 # Sample assets — replace later with real asset RFID IDs
 c.execute("INSERT OR REPLACE INTO assets VALUES ('163941859838', 'Breadboard Kit', 'electronics', 1, 0, 'slot1', NULL)")
 c.execute("INSERT OR REPLACE INTO assets VALUES ('737756135838', 'Oscilloscope Probe Set', 'electronics', 1, 1, 'slot2', NULL)")
-c.execute("INSERT OR REPLACE INTO assets VALUES ('685595771343', 'Multimeter Kit', 'electronics', 0, 0, 'slot3',NULL)")
+c.execute("INSERT OR REPLACE INTO assets VALUES ('685595771343', 'Multimeter Kit', 'electronics', 1, 0, 'slot3',NULL)")
 c.execute("INSERT OR REPLACE INTO assets VALUES ('107973067209', 'FPGA Development Board', 'advanced', 1, 1, 'slot4', NULL)")
-c.execute("INSERT OR REPLACE INTO assets VALUES ('529265738162', 'Signal Generator', 'electronics', 0, 0, 'slot5', NULL)")
+c.execute("INSERT OR REPLACE INTO assets VALUES ('529265738162', 'Signal Generator', 'electronics', 1, 0, 'slot5', NULL)")
 
 conn.commit()
 conn.close()
