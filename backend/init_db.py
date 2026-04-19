@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS alerts (
 # Sample users — replace these with your real RFID IDs after scanning
 c.execute("INSERT OR REPLACE INTO users VALUES ('1079825143068', 'Alice', 'student', 1, 0, 0)")
 c.execute("INSERT OR REPLACE INTO users VALUES ('946175681221', 'Bob', 'TA', 3, 0, 0)")
+c.execute("INSERT OR REPLACE INTO users VALUES ('360419244072', 'Charlie', 'student', 1, 0, 0)")
+c.execute("INSERT OR REPLACE INTO users VALUES ('700209248293', 'Diana', 'TA', 3, 0, 0)")
 
 # Sample assets — replace later with real asset RFID IDs
 c.execute("INSERT OR REPLACE INTO assets VALUES ('163941859838', 'Breadboard Kit', 'electronics', 1, 0, 'slot1', NULL)")
@@ -59,6 +61,10 @@ c.execute("INSERT OR REPLACE INTO assets VALUES ('737756135838', 'Oscilloscope P
 c.execute("INSERT OR REPLACE INTO assets VALUES ('685595771343', 'Multimeter Kit', 'electronics', 1, 0, 'slot3',NULL)")
 c.execute("INSERT OR REPLACE INTO assets VALUES ('107973067209', 'FPGA Development Board', 'advanced', 1, 1, 'slot4', NULL)")
 c.execute("INSERT OR REPLACE INTO assets VALUES ('529265738162', 'Signal Generator', 'electronics', 1, 0, 'slot5', NULL)")
+c.execute("INSERT OR REPLACE INTO assets VALUES ('629040327669', 'RC522 Kit', 'electronics', 1, 0, 'slot6', NULL)")
+c.execute("INSERT OR REPLACE INTO assets VALUES ('355822578572', 'Soldering Iron', 'tools', 1, 1, 'slot7', NULL)")
+
+
 
 conn.commit()
 conn.close()

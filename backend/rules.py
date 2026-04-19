@@ -51,7 +51,7 @@ def handle_precheck(data):
         create_alert(user_id, None, "UNKNOWN_USER", "Unknown user failed precheck")
         return response
 
-    asset = get_asset_by_name(requested_asset)
+    asset = get_asset_by_id(requested_asset)
 
     if not asset:
         response = {
