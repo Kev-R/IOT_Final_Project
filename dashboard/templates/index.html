@@ -13,48 +13,95 @@
             color: #222;
         }
 
-        h1, h2 {
-            margin-bottom: 10px;
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 12px;
         }
 
         .section {
             background: white;
-            padding: 16px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            padding: 18px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
+            border: 1px solid #d8dee6;
+            padding: 10px;
             text-align: left;
             font-size: 14px;
+            vertical-align: top;
         }
 
         th {
-            background: #e9eef3;
+            background: #eef3f8;
         }
 
-        .available {
-            color: green;
-            font-weight: bold;
-        }
-
-        .checkedout {
-            color: red;
-            font-weight: bold;
+        tr:nth-child(even) {
+            background: #fafbfd;
         }
 
         .empty-note {
             color: #666;
             font-style: italic;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-checkedout {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-restricted {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-open {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-denied {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-alert {
+            background: #fde68a;
+            color: #92400e;
+        }
+
+        .mono {
+            font-family: monospace;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -66,8 +113,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>Asset ID</th>
                     <th>Asset Name</th>
+                    <th>Asset ID</th>
                     <th>Category</th>
                     <th>Status</th>
                     <th>Restricted</th>
@@ -78,21 +125,32 @@
             <tbody>
                 {% for asset in assets %}
                 <tr>
-                    <td>{{ asset["asset_id"] }}</td>
                     <td>{{ asset["asset_name"] }}</td>
+                    <td class="mono">{{ asset["asset_id"] }}</td>
                     <td>{{ asset["category"] }}</td>
                     <td>
                         {% if asset["available"] == 1 %}
-                            <span class="available">Available</span>
+                            <span class="badge badge-available">Available</span>
                         {% else %}
-                            <span class="checkedout">Checked Out</span>
+                            <span class="badge badge-checkedout">Checked Out</span>
                         {% endif %}
                     </td>
                     <td>
-                        {% if asset["restricted"] == 1 %}Yes{% else %}No{% endif %}
+                        {% if asset["restricted"] == 1 %}
+                            <span class="badge badge-restricted">Restricted</span>
+                        {% else %}
+                            <span class="badge badge-open">Open Access</span>
+                        {% endif %}
                     </td>
                     <td>{{ asset["shelf_slot"] }}</td>
-                    <td>{{ asset["current_holder"] if asset["current_holder"] else "-" }}</td>
+                    <td>
+                        {% if asset["holder_name"] %}
+                            {{ asset["holder_name"] }}
+                            <div class="mono">{{ asset["current_holder"] }}</div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -106,8 +164,8 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>User ID</th>
-                    <th>Asset ID</th>
+                    <th>User</th>
+                    <th>Asset</th>
                     <th>Action</th>
                     <th>Result</th>
                     <th>Reason</th>
@@ -118,10 +176,30 @@
                 {% for tx in transactions %}
                 <tr>
                     <td>{{ tx["transaction_id"] }}</td>
-                    <td>{{ tx["user_id"] }}</td>
-                    <td>{{ tx["asset_id"] if tx["asset_id"] else "-" }}</td>
+                    <td>
+                        {% if tx["user_name"] %}
+                            {{ tx["user_name"] }}
+                            <div class="mono">{{ tx["user_id"] }}</div>
+                        {% else %}
+                            <span class="mono">{{ tx["user_id"] if tx["user_id"] else "-" }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if tx["asset_name"] %}
+                            {{ tx["asset_name"] }}
+                            <div class="mono">{{ tx["asset_id"] }}</div>
+                        {% else %}
+                            <span class="mono">{{ tx["asset_id"] if tx["asset_id"] else "-" }}</span>
+                        {% endif %}
+                    </td>
                     <td>{{ tx["action"] }}</td>
-                    <td>{{ tx["result"] }}</td>
+                    <td>
+                        {% if tx["result"] == "approved" %}
+                            <span class="badge badge-approved">Approved</span>
+                        {% else %}
+                            <span class="badge badge-denied">Denied</span>
+                        {% endif %}
+                    </td>
                     <td>{{ tx["reason"] }}</td>
                     <td>{{ tx["timestamp"] }}</td>
                 </tr>
@@ -140,8 +218,8 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>User ID</th>
-                    <th>Asset ID</th>
+                    <th>User</th>
+                    <th>Asset</th>
                     <th>Alert Type</th>
                     <th>Message</th>
                     <th>Timestamp</th>
@@ -151,9 +229,23 @@
                 {% for alert in alerts %}
                 <tr>
                     <td>{{ alert["alert_id"] }}</td>
-                    <td>{{ alert["user_id"] if alert["user_id"] else "-" }}</td>
-                    <td>{{ alert["asset_id"] if alert["asset_id"] else "-" }}</td>
-                    <td>{{ alert["alert_type"] }}</td>
+                    <td>
+                        {% if alert["user_name"] %}
+                            {{ alert["user_name"] }}
+                            <div class="mono">{{ alert["user_id"] }}</div>
+                        {% else %}
+                            <span class="mono">{{ alert["user_id"] if alert["user_id"] else "-" }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if alert["asset_name"] %}
+                            {{ alert["asset_name"] }}
+                            <div class="mono">{{ alert["asset_id"] }}</div>
+                        {% else %}
+                            <span class="mono">{{ alert["asset_id"] if alert["asset_id"] else "-" }}</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge badge-alert">{{ alert["alert_type"] }}</span></td>
                     <td>{{ alert["message"] }}</td>
                     <td>{{ alert["timestamp"] }}</td>
                 </tr>
