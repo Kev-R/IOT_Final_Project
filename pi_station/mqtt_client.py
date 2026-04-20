@@ -2,7 +2,7 @@ import json
 import paho.mqtt.client as mqtt
 
 #BROKER = "192.168.68.51"   # replace if needed
-BROKER = "192.168.4.168"
+BROKER = "192.168.68.61"
 
 class PiMQTTClient:
     def __init__(self):
