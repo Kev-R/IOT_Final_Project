@@ -52,7 +52,7 @@ def index():
         LEFT JOIN users u ON t.user_id = u.user_id
         LEFT JOIN assets a ON t.asset_id = a.asset_id
         ORDER BY t.transaction_id DESC
-        LIMIT 20
+        LIMIT 7
     """)
     transactions = c.fetchall()
 

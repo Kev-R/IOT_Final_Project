@@ -2,7 +2,7 @@ import json
 import paho.mqtt.client as mqtt
 from rules import handle_usercheck, handle_precheck, handle_finalize, handle_return
 
-BROKER = "192.168.4.168"
+BROKER = "localhost"
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
