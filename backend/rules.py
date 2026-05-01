@@ -1,3 +1,20 @@
+"""
+rules.py
+
+Backend rule engine for the Smart Lab Inventory Tracking System.
+
+This module contains the decision logic for all user and asset operations. The
+server receives MQTT messages and forwards the parsed JSON data to these handler
+functions. Each handler returns a response dictionary that is sent back to the
+Raspberry Pi over MQTT.
+
+Main operations:
+- handle_usercheck: validate that a user RFID exists.
+- handle_precheck: validate that a checkout request is allowed.
+- handle_finalize: commit a checkout to the database.
+- handle_return: validate and commit an asset return.
+"""
+
 from database import (
     get_user,
     get_asset_by_name,
@@ -9,6 +26,12 @@ from database import (
 )
 from alerts import create_alert
 
+
+"""
+Validate a scanned user RFID tag
+Expected input: {"node_id": "station_1", "user_id": "..."}
+Returns approved if the user exists in the database, otherwise denied
+"""
 def handle_usercheck(data):
     node_id = data.get("node_id", "unknown")
     user_id = data.get("user_id")
@@ -34,7 +57,21 @@ def handle_usercheck(data):
     return response
 
 
+
+"""
+Validate whether a user is allowed to check out a scanned asset.
+
+This function checks all policy rules before committing the checkout:
+- user must exist
+- asset must exist
+- user must not be blocked
+- user must not have overdue items
+- asset must be available
+- user must not exceed max item limit
+- restricted assets require a TA role
+"""
 def handle_precheck(data):
+
     node_id = data.get("node_id", "unknown")
     user_id = data.get("user_id")
     requested_asset = data.get("requested_asset")
@@ -63,11 +100,11 @@ def handle_precheck(data):
         create_alert(user_id, None, "ASSET_NOT_FOUND", f"Requested asset not found: {requested_asset}")
         return response
 
-    # asset: (asset_id, asset_name, category, available, restricted, shelf_slot, current_holder)
+    # asset tuple layout: (asset_id, asset_name, category, available, restricted, shelf_slot, current_holder)
     available = asset[3]
     restricted = asset[4]
 
-    # user: (user_id, name, role, max_items, blocked, overdue_count)
+    # user tuple layout: (user_id, name, role, max_items, blocked, overdue_count)
     user_role = user[2]
     max_items = user[3]
     blocked = user[4]
@@ -135,6 +172,12 @@ def handle_precheck(data):
     return response
 
 
+
+"""
+Commit a checkout after precheck approval.
+This function performs final validation to ensure the correct asset is being checked out,
+and then updates the database to mark the asset as checked out by that user.
+"""
 def handle_finalize(data):
     node_id = data.get("node_id", "unknown")
     user_id = data.get("user_id")
@@ -183,6 +226,7 @@ def handle_finalize(data):
         log_transaction(user_id, scanned_asset_id, "finalize", "denied", "Item already checked out")
         return response
 
+    # All checks passed, so update the asset row and record the transaction
     mark_asset_checked_out(user_id, scanned_asset_id)
 
     response = {
@@ -196,7 +240,17 @@ def handle_finalize(data):
     return response
 
 
+"""
+Validate and commit an asset return.
+
+The return is approved only if:
+- user exists
+- asset exists
+- asset is currently checked out
+- the returning user is the current holder
+"""
 def handle_return(data):
+
     node_id = data.get("node_id", "unknown")
     user_id = data.get("user_id")
     scanned_asset_id = str(data.get("scanned_asset_id"))
@@ -246,6 +300,7 @@ def handle_return(data):
         create_alert(user_id, scanned_asset_id, "WRONG_RETURN_USER", "Wrong user attempted return")
         return response
 
+    # Return is valid, so clear current_holder and mark the item available
     mark_asset_returned(scanned_asset_id)
 
     response = {

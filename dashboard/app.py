@@ -1,13 +1,28 @@
+"""
+app.py
+
+Flask dashboard for the Smart Lab Inventory Tracking System.
+
+The dashboard does not communicate over MQTT. Instead, it reads directly from
+the SQLite database that the backend updates. This allows operators to view the
+current inventory, recent transactions, and recent alerts in a browser.
+"""
+
 from flask import Flask, render_template
 import sqlite3
 import os
 
 app = Flask(__name__)
 
+# Resolve the database path relative to this dashboard folder.
+# Expected project structure:
+# smartlab/
+#   backend/lab.db
+#   dashboard/app.py
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "..", "backend", "lab.db")
 
-
+# Open SQLite connection and return rows that behave like dictionaries
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -16,10 +31,11 @@ def get_connection():
 
 @app.route("/")
 def index():
+    """Render the main dashboard page."""
     conn = get_connection()
     c = conn.cursor()
 
-    # Inventory with current holder name
+    # Inventory view
     c.execute("""
         SELECT
             a.asset_id,
@@ -36,7 +52,7 @@ def index():
     """)
     assets = c.fetchall()
 
-    # Transactions with user name and asset name
+    # Recent transactions view
     c.execute("""
         SELECT
             t.transaction_id,
@@ -56,7 +72,7 @@ def index():
     """)
     transactions = c.fetchall()
 
-    # Alerts with user name and asset name
+    # Recent alerts view
     c.execute("""
         SELECT
             al.alert_id,
